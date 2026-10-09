@@ -6,3 +6,5 @@ dist/
 !.env.example
 *.log
 .tools/
+/cloudflare/public/
+/cloudflare/.dev.vars
