@@ -47,7 +47,8 @@ export async function getNews(params, {clientId,clientSecret,fetchImpl=fetch}={}
   const failed = results.filter(r=>r.status==='rejected');
   if(failed.length===results.length) {
     const reasons=failed.map(r=>r.reason?.message);
-    return {status:502,body:{message:reasons.some(r=>['401','403'].includes(r))?'뉴스 API 인증에 실패했어요. 서버 키와 검색 API 권한을 확인해 주세요.':reasons.includes('429')?'뉴스 요청 한도에 도달했어요. 잠시 후 다시 시도해 주세요.':'뉴스 제공처에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'}};
+    const upstreamStatus = reasons.find(r => /^\d{3}$/.test(r));
+    return {status:502,body:{code:upstreamStatus?`UPSTREAM_${upstreamStatus}`:'UPSTREAM_NETWORK_ERROR',message:reasons.some(r=>['401','403'].includes(r))?'뉴스 API 인증에 실패했어요. 서버 키와 검색 API 권한을 확인해 주세요.':reasons.includes('429')?'뉴스 요청 한도에 도달했어요. 잠시 후 다시 시도해 주세요.':'뉴스 제공처에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'}};
   }
   const merged=new Map();
   for(const r of results) if(r.status==='fulfilled') for(const a of r.value.articles) {
