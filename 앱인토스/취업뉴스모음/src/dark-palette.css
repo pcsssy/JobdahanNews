@@ -1,0 +1,25 @@
+/* Dark mode uses a different identity from the light lime/ink palette. */
+:root[data-theme="dark"] {
+  --bg: #12131b;
+  --surface: #1c1e29;
+  --ink: #f3f4ff;
+  --muted: #b6b8ca;
+  --border: #3c3f52;
+  --soft: #292c3b;
+  --accent: #b8c2ff;
+  --inverse: #161728;
+}
+
+:root[data-theme="dark"] .intro { background: linear-gradient(135deg, #272052, #17284a); }
+:root[data-theme="dark"] .intro .eyebrow { color: #c8d0ff !important; }
+:root[data-theme="dark"] .intro p { color: #d0d5f1; }
+:root[data-theme="dark"] .notes-launch { background: #b8c2ff; color: #17182a; }
+:root[data-theme="dark"] .selected-topic { background: #363b65; color: #f3f4ff; }
+:root[data-theme="dark"] .topic-grid .chip[aria-pressed="true"] {
+  background: #b8c2ff; color: #17182a; border-color: #b8c2ff; box-shadow: 2px 2px 0 #777fa8;
+}
+:root[data-theme="dark"] .tabs button[aria-pressed="true"] { border-color: #b8c2ff; }
+:root[data-theme="dark"] .news-card { border-left-color: #8d97d8; }
+:root[data-theme="dark"] .category { background: #30334a; color: #dfe3ff; }
+:root[data-theme="dark"] .load-more { box-shadow: 3px 3px 0 #5c6285; }
+:root[data-theme="dark"] .job-mark { background: #b8c2ff; color: #17182a; }
