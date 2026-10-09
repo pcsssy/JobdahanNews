@@ -1,0 +1,7 @@
+{
+  "name": "jobdahan-news",
+  "private": true,
+  "scripts": {
+    "build": "node cloudflare/build-assets.mjs"
+  }
+}

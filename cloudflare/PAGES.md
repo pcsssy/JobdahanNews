@@ -3,7 +3,7 @@
 Cloudflare Pages 프로젝트 `jobdahannews`의 **Settings > Builds**를 다음과 같이 설정합니다.
 
 - Production branch: `master`
-- Build command: `node cloudflare/build-assets.mjs`
+- Build command: `npm run build`
 - Build output directory: `cloudflare/public`
 - Root directory: 비워 둠
 
