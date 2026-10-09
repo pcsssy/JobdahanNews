@@ -31,7 +31,14 @@ export async function getNews(params, {clientId,clientSecret,fetchImpl=fetch}={}
   const results = await Promise.allSettled(searches.map(async tag=>{
     const url = new URL('https://naverapihub.apigw.ntruss.com/search/v1/news');
     url.search = new URLSearchParams({query:[topics[tag],query].filter(Boolean).join(' '),display:'20',start:String((page - 1) * 20 + 1),sort:'date'});
-    const response = await fetchImpl(url,{headers:{'X-NCP-APIGW-API-KEY-ID':clientId,'X-NCP-APIGW-API-KEY':clientSecret},signal:AbortSignal.timeout(8000),redirect:'error'});
+    const abort = new AbortController();
+    const timeout = setTimeout(() => abort.abort(), 8000);
+    let response;
+    try {
+      response = await fetchImpl(url,{headers:{'X-NCP-APIGW-API-KEY-ID':clientId,'X-NCP-APIGW-API-KEY':clientSecret},signal:abort.signal,redirect:'error'});
+    } finally {
+      clearTimeout(timeout);
+    }
     if(!response.ok) throw new Error(String(response.status));
     const body = await response.json();
     if(!Array.isArray(body.items)) throw new Error('INVALID_RESPONSE');
