@@ -8,6 +8,8 @@
     if(old) state={interests:Array.isArray(old.interests)?old.interests.filter(t=>known.has(t)):[],saved:Array.isArray(old.saved)?old.saved.filter(a=>a&&safeUrl(a.url)&&a.id===a.url&&typeof a.title==='string'&&Array.isArray(a.categories)).slice(0,100):[]};
   } catch { /* Start empty when browser storage is unavailable. */ }
   const selected=new Set(state.interests);
+  const configuredApiBase=String(globalThis.__NEWS_API_BASE__||'').replace(/\/$/,'');
+  const apiBase=configuredApiBase==='__NEWS_API_BASE__'?'':configuredApiBase;
   let view='all',articles=[],query='',loading=false,error='',partial=false,hasMore=false,page=1,controller,timer,serial=0;
   const el=(tag,cls,text)=>{const node=document.createElement(tag);node.className=cls;if(text!==undefined)node.textContent=text;return node;};
   function notify(message){$('#status').textContent=message;$('#status').classList.add('visible');clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('#status').classList.remove('visible'),4000);}
@@ -57,7 +59,7 @@
     if(location.protocol==='file:'){error='서버 실행 후 http://127.0.0.1:5173 에서 실제 뉴스를 확인해 주세요.';render();return;}
     loading=true;render();const current=new AbortController();controller=current;const timeout=setTimeout(()=>current.abort(),15000);
     const nextPage=more?page+1:1,params=new URLSearchParams({q:query,page:String(nextPage)});(view==='interest'?state.interests:[...selected]).forEach(t=>params.append('tag',t));
-    try{const response=await fetch(`/api/news?${params}`,{signal:current.signal});const body=await response.json();if(!response.ok)throw new Error(body.message||'뉴스를 불러오지 못했어요.');if(!Array.isArray(body.articles))throw new Error('뉴스 응답을 확인하지 못했어요.');if(id!==serial)return;const knownArticles=new Set(articles.map(a=>a.id));articles=more?[...articles,...body.articles.filter(a=>!knownArticles.has(a.id))]:body.articles;page=nextPage;partial=body.partial;hasMore=Boolean(body.hasMore);}
+    try{const response=await fetch(`${apiBase}/api/news?${params}`,{signal:current.signal});const body=await response.json();if(!response.ok)throw new Error(body.message||'뉴스를 불러오지 못했어요.');if(!Array.isArray(body.articles))throw new Error('뉴스 응답을 확인하지 못했어요.');if(id!==serial)return;const knownArticles=new Set(articles.map(a=>a.id));articles=more?[...articles,...body.articles.filter(a=>!knownArticles.has(a.id))]:body.articles;page=nextPage;partial=body.partial;hasMore=Boolean(body.hasMore);}
     catch(cause){if(id!==serial)return;error=cause.name==='AbortError'?'연결 시간이 초과되었어요. 다시 시도해 주세요.':cause.message;}
     finally{clearTimeout(timeout);if(id===serial){loading=false;render();}}
   }

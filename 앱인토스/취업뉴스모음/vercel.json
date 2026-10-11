@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/news.mjs": {
+      "maxDuration": 15
+    }
+  }
+}
