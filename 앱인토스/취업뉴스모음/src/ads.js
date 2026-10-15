@@ -3,44 +3,49 @@ import { TossAds } from '@apps-in-toss/web-framework';
 const AD_GROUP_ID = 'ait.v2.live.8d33d2477f554ba7';
 let initialized = false;
 let latestFeed = { showAd: false };
-let attachedBanner = null;
+let attachedBanners = [];
 
 function clearBanner() {
-  try { attachedBanner?.destroy(); } catch {}
-  attachedBanner = null;
-  document.querySelector('#news-banner-ad')?.remove();
+  for (const banner of attachedBanners) {
+    try { banner.destroy(); } catch {}
+  }
+  attachedBanners = [];
+  document.querySelectorAll('.ad-banner-slot').forEach(slot => slot.remove());
 }
 
 function mountBanner() {
   clearBanner();
   if (!initialized || !latestFeed.showAd) return;
 
-  const cards = document.querySelectorAll('#news-list > .news-card');
+  const cards = [...document.querySelectorAll('#news-list > .news-card')];
   if (cards.length < 5) return;
 
-  const host = document.createElement('div');
-  host.id = 'news-banner-ad';
-  host.className = 'ad-banner-slot';
-  host.setAttribute('aria-label', '광고');
-  cards[4].after(host);
+  for (let index = 4; index < cards.length; index += 5) {
+    const host = document.createElement('div');
+    host.id = `news-banner-ad-${Math.floor(index / 5) + 1}`;
+    host.className = 'ad-banner-slot';
+    host.setAttribute('aria-label', '광고');
+    cards[index].after(host);
 
-  const removeEmptyAd = () => {
-    if (host.isConnected) host.remove();
-  };
+    const removeEmptyAd = () => {
+      if (host.isConnected) host.remove();
+    };
 
-  try {
-    attachedBanner = TossAds.attachBanner(AD_GROUP_ID, host, {
-      theme: 'auto',
-      tone: 'grey',
-      variant: 'card',
-      callbacks: {
-        onAdRendered: () => host.classList.add('is-ready'),
-        onNoFill: removeEmptyAd,
-        onAdFailedToRender: removeEmptyAd,
-      },
-    });
-  } catch {
-    removeEmptyAd();
+    try {
+      const banner = TossAds.attachBanner(AD_GROUP_ID, host, {
+        theme: 'auto',
+        tone: 'grey',
+        variant: 'card',
+        callbacks: {
+          onAdRendered: () => host.classList.add('is-ready'),
+          onNoFill: removeEmptyAd,
+          onAdFailedToRender: removeEmptyAd,
+        },
+      });
+      attachedBanners.push(banner);
+    } catch {
+      removeEmptyAd();
+    }
   }
 }
 
