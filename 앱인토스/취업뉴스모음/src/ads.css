@@ -1,0 +1,9 @@
+.ad-banner-slot {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.ad-banner-slot.is-ready {
+  margin: 4px 0;
+}

@@ -33,8 +33,8 @@
     const data=view==='saved'?state.saved.filter(a=>(!selected.size||a.categories.some(t=>selected.has(t)))&&`${a.title} ${a.description||''}`.toLowerCase().includes(query.toLowerCase())):articles;
     $('#result-count').textContent=loading?'불러오는 중':`${data.length}개`;
     const more=$('#load-more'); more.hidden=view==='saved'||loading||!hasMore; more.disabled=loading; more.textContent='뉴스 더 보기';
-    if(loading){list.append(el('div','empty','최신 뉴스를 불러오고 있어요…'));return;}
-    if(error){const box=el('div','empty',error),retry=el('button','save-interests','다시 시도');retry.onclick=load;box.append(retry);list.append(box);return;}
+    if(loading){list.append(el('div','empty','최신 뉴스를 불러오고 있어요…'));window.dispatchEvent(new CustomEvent('jobdahan:feed-rendered',{detail:{showAd:false}}));return;}
+    if(error){const box=el('div','empty',error),retry=el('button','save-interests','다시 시도');retry.onclick=load;box.append(retry);list.append(box);window.dispatchEvent(new CustomEvent('jobdahan:feed-rendered',{detail:{showAd:false}}));return;}
     if(partial)list.append(el('p','demo-notice','일부 분야를 불러오지 못했어요. 잠시 후 다시 검색해 주세요.'));
     if(!data.length)list.append(el('div','empty',view==='interest'&&!state.interests.length?'분야를 선택한 뒤 관심 분야로 저장해 주세요.':view==='saved'?'저장한 뉴스가 없거나 선택 조건에 맞지 않아요.':'검색 결과가 없어요. 다른 분야나 키워드를 선택해 주세요.'));
     for(const a of data){
@@ -51,6 +51,7 @@
       memo.onclick=()=>window.jobNotes.open(a);
       bottom.append(memo,button);card.append(top,content,bottom);list.append(card);
     }
+    window.dispatchEvent(new CustomEvent('jobdahan:feed-rendered',{detail:{showAd:view!=='saved'&&data.length>=5}}));
   }
   function schedule(){clearTimeout(timer);controller?.abort();serial++;articles=[];page=1;hasMore=false;error='';loading=view!=='saved';render();timer=setTimeout(()=>load(false),500);}
   async function load(more=false){
